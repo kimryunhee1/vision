@@ -2,24 +2,28 @@ import streamlit as st
 
 st.set_page_config(page_title="미리 준비된 퀴즈", layout="centered")
 
-# CSS 스타일 삽입
+# 구글 폰트 'Noto Sans KR' 불러오고 스타일 적용
 st.markdown(
     """
     <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap');
+
     .main {
         background-color: #f0f8ff;
         color: #333333;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-family: 'Noto Sans KR', sans-serif;
         padding: 20px 40px;
     }
     h1, h2, h3 {
         color: #004080;
+        font-family: 'Noto Sans KR', sans-serif;
     }
     .stRadio > div {
         background-color: #e6f2ff;
         padding: 10px;
         border-radius: 8px;
         margin-bottom: 8px;
+        font-family: 'Noto Sans KR', sans-serif;
     }
     button {
         background-color: #007acc;
@@ -28,9 +32,11 @@ st.markdown(
         border-radius: 8px;
         padding: 10px 20px;
         margin-top: 10px;
+        font-family: 'Noto Sans KR', sans-serif;
     }
     </style>
-    """, unsafe_allow_html=True
+    """,
+    unsafe_allow_html=True
 )
 
 st.title("🎯 나를 맞춰봐! 🌟")
