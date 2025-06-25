@@ -1,32 +1,28 @@
 import streamlit as st
-from textblob import TextBlob
 
-# 앱 제목
-st.title("😊 간단한 감정 분석기")
+# 감정 단어 리스트 (예시)
+positive_words = ["좋다", "사랑", "기쁨", "감사", "행복", "최고", "멋지다"]
+negative_words = ["싫다", "짜증", "화남", "슬픔", "우울", "불쾌", "최악"]
 
-# 입력 박스
-user_input = st.text_area("문장을 입력해 주세요:", "")
+def analyze_sentiment(text):
+    pos = sum(word in text for word in positive_words)
+    neg = sum(word in text for word in negative_words)
 
-# 분석 버튼
+    if pos > neg:
+        return "긍정 😊"
+    elif neg > pos:
+        return "부정 😞"
+    else:
+        return "중립 😐"
+
+# Streamlit 인터페이스
+st.title("간단한 감정 분석기 (TextBlob 없이)")
+
+text = st.text_area("문장을 입력하세요:")
+
 if st.button("감정 분석하기"):
-    if user_input.strip() == "":
+    if text.strip() == "":
         st.warning("문장을 입력해 주세요!")
     else:
-        # 감정 분석 수행
-        blob = TextBlob(user_input)
-        polarity = blob.sentiment.polarity  # -1 ~ 1 사이 값
-
-        # 결과 해석
-        if polarity > 0.1:
-            sentiment = "긍정 😊"
-            color = "green"
-        elif polarity < -0.1:
-            sentiment = "부정 😞"
-            color = "red"
-        else:
-            sentiment = "중립 😐"
-            color = "gray"
-
-        # 결과 출력
-        st.markdown(f"**감정 결과**: <span style='color:{color}; font-size:24px'>{sentiment}</span>", unsafe_allow_html=True)
-        st.write(f"감정 점수 (Polarity): `{polarity:.2f}`")
+        result = analyze_sentiment(text)
+        st.markdown(f"**감정 결과**: <span style='font-size:24px'>{result}</span>", unsafe_allow_html=True)
