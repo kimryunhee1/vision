@@ -1,49 +1,61 @@
 import streamlit as st
 
-# 확장된 긍정 단어 목록
-positive_words = [
-    "좋다", "행복", "기쁘다", "사랑", "감사", "즐겁다", "신난다", "만족", "멋지다", "최고다",
-    "훌륭하다", "예쁘다", "잘했다", "성공", "행운", "기분 좋다", "추천", "반가워", "든든하다", "대박"
-]
+st.set_page_config(page_title="나만의 퀴즈 생성기", layout="centered")
 
-# 확장된 부정 단어 목록 + 아프거나 힘든 감정 표현
-negative_words = [
-    "싫다", "짜증", "화나다", "슬프다", "우울", "지치다", "힘들다", "나쁘다", "최악", "불만",
-    "실망", "지겹다", "짜증난다", "외롭다", "지옥", "무섭다", "불쾌", "지루하다",
-    "아프다", "두통", "열", "기침", "피곤", "컨디션", "속이 안좋다", "병원", "몸살", "토할 것 같다",
-    "눈물", "스트레스", "정신적", "무기력", "아무것도 하기 싫다"
-]
+st.title("📚 나만의 퀴즈 생성기")
 
-# 감정 분석 함수
-def analyze_sentiment(text):
-    text = text.lower()
-    words = text.split()
+# 세션에 문제 저장할 리스트 초기화
+if "quiz_list" not in st.session_state:
+    st.session_state.quiz_list = []
 
-    pos_count = sum(any(pos_word in word for pos_word in positive_words) for word in words)
-    neg_count = sum(any(neg_word in word for neg_word in negative_words) for word in words)
+with st.expander("➕ 퀴즈 추가하기"):
+    question = st.text_input("문제 입력")
+    option1 = st.text_input("보기 1")
+    option2 = st.text_input("보기 2")
+    option3 = st.text_input("보기 3")
+    option4 = st.text_input("보기 4")
+    answer = st.selectbox("정답 선택", options=["1", "2", "3", "4"])
 
-    if pos_count > neg_count:
-        return "긍정 😊", pos_count, neg_count
-    elif neg_count > pos_count:
-        return "부정 😞", pos_count, neg_count
-    else:
-        return "중립 😐", pos_count, neg_count
+    if st.button("퀴즈 추가"):
+        if all([question, option1, option2, option3, option4]):
+            st.session_state.quiz_list.append({
+                "question": question,
+                "options": [option1, option2, option3, option4],
+                "answer": answer
+            })
+            st.success("퀴즈가 추가되었습니다!")
+        else:
+            st.warning("모든 항목을 입력해 주세요.")
 
-# Streamlit UI 구성
-st.title("💬 감정 분석기 (TextBlob 없이 작동)")
+# 퀴즈 풀이 시작
+if st.session_state.quiz_list:
+    st.subheader("📝 퀴즈 풀기")
 
-user_input = st.text_area("문장을 입력하세요:")
+    user_answers = []
+    score = 0
 
-if st.button("감정 분석하기"):
-    if user_input.strip() == "":
-        st.warning("문장을 입력해 주세요!")
-    else:
-        result, pos_score, neg_score = analyze_sentiment(user_input)
+    for idx, quiz in enumerate(st.session_state.quiz_list):
+        st.markdown(f"**Q{idx + 1}. {quiz['question']}**")
+        choice = st.radio(
+            f"선택하세요:",
+            quiz["options"],
+            key=f"quiz_{idx}"
+        )
+        user_answers.append(choice)
 
-        st.markdown(f"### 감정 결과: **{result}**")
-        st.write(f"👍 긍정 단어 수: `{pos_score}`")
-        st.write(f"👎 부정 단어 수: `{neg_score}`")
+    if st.button("정답 제출"):
+        st.subheader("📊 결과")
+        for idx, quiz in enumerate(st.session_state.quiz_list):
+            correct = quiz["options"][int(quiz["answer"]) - 1]
+            user_choice = user_answers[idx]
+            is_correct = user_choice == correct
+            if is_correct:
+                score += 1
+                st.success(f"Q{idx+1} 정답! ✅")
+            else:
+                st.error(f"Q{idx+1} 오답 ❌ (정답: {correct})")
 
-        # 공감 메시지
-        if result == "부정 😞":
-            st.info("💙 힘든 마음이 느껴져요. 잠깐 쉬어가도 괜찮아요. 필요한 건 당신의 회복입니다.")
+        st.markdown(f"### 🏁 총 점수: {score} / {len(st.session_state.quiz_list)}")
+
+else:
+    st.info("먼저 퀴즈를 하나 이상 추가해 주세요.")
